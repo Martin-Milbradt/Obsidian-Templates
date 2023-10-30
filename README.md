@@ -11,3 +11,7 @@ The [Templater Scripts](Templater%20Scripts) called from the templates can be re
 
 The files are tailored for my personal use. They contain `scriptOptions` for some configurability, but you are encouraged to make them your own. Let me know what works for you and what doesn't!  
 Do not look at the files in [ZZ4 Templates](ZZ4%20Templaters) in GitHub's `Preview`, but use the `Code` view.
+
+## Acknowledgement
+
+Some scripts were created in collaboration with [eikowagenknecht](https://github.com/eikowagenknecht) or based on other templates online.
