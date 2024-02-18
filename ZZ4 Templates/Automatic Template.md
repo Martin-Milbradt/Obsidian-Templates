@@ -1,6 +1,7 @@
 <%*
 /* Requirements:
-	- Requirements from called templates
+
+- Requirements from called templates
 */
 
 // Config options here
@@ -10,20 +11,25 @@ const scriptOptions = {
 
 const valid_youtube_url = /^(https?:\/*)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)\S+$/;
 const valid_bgg_url = /^(https?:\/*)?(www\.)?boardgamegeek\.com\/boardgame\/(\d+)\S*$/;
-let clipboard = await tp.system.clipboard();
+
+let clipboard = "";
+clipboard = await tp.system.clipboard();
+if (clipboard == "Error_MobileUnsupportedTemplate") {
+ clipboard = ""
+}
 
 // Test URLs:
-// clipboard = "https://youtu.be/KB1vxqD0uPE";
-// clipboard = "https://slatestarcodex.com/2014/01/12/a-response-to-apophemi-on-triggers/"
-// clipboard = "https://boardgamegeek.com/boardgame/235902/natives"
+// clipboard = "<https://youtu.be/KB1vxqD0uPE>";
+// clipboard = "<https://slatestarcodex.com/2014/01/12/a-response-to-apophemi-on-triggers/>"
+// clipboard = "<https://boardgamegeek.com/boardgame/235902/natives>"
 
 let template;
 if (valid_youtube_url.test(clipboard)) {
     template = tp.file.find_tfile(scriptOptions.folder + "Video (YouTube)")
 } else if (valid_bgg_url.test(clipboard)) {
-	template = tp.file.find_tfile(scriptOptions.folder + "Board Game")
+ template = tp.file.find_tfile(scriptOptions.folder + "Board Game")
 } else {
-	template = tp.file.find_tfile(scriptOptions.folder + "Written");
+ template = tp.file.find_tfile(scriptOptions.folder + "Written");
 }
 await tp.file.create_new(template, "Untitled", true);
 -%>

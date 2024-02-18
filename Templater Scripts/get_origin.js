@@ -20,9 +20,18 @@ function getOrigin(url) {
         result.Source = "EA Forum";
         result.Tags.push("ea");
     }
+    else if (url.startsWith("https://thezvi.substack.com/p/")) {
+        result.Source = "Don't Worry About the Vase";
+        result.Author = "Zvi Mowshowitz";
+        result.Tags.push("rationality");
+    }
+    else if (url.startsWith("https://www.readthesequences.com/")) {
+        result.Source = "The Sequences - Rationality From AI to Zombies|Sequences";
+        result.Author = "Eliezer Yudkowsky";
+        result.Tags.push("rationality");
+    }
 
     return result;
 }
-
 
 module.exports = getOrigin;

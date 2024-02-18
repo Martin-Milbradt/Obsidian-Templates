@@ -27,37 +27,47 @@ async function tryGetFileType(url) {
 }
 
 async function getPageTitle(url) {
+  const result = { Title: url, Published: null, Success: false };
   if (!(url.startsWith("http") || url.startsWith("https"))) {
     url = "https://" + url;
   }
 
   try {
     const html = await request({ url });
-
     const doc = new DOMParser().parseFromString(html, "text/html");
+        // Select the script element with type application/ld+json
+
     const title = doc.querySelectorAll("title")[0];
-
+    const published = doc.querySelector('meta[property="article:published_time"]');
+    if (published?.content) {
+      result.Published = published.content;
+    } else {
+      const scriptElement = doc.querySelector('script[type="application/ld+json"]');
+      if (scriptElement?.innerText) {
+        const jsonData = JSON.parse(scriptElement?.innerText);
+        if (jsonData?.datePublished) {
+          result.Published = jsonData.datePublished;
+        }
+      }
+    }
     if (title?.innerText) {
-      return title.innerText;
+      result.Title = title.innerText.split(/[|—–]|( - )|( · )/)[0].trim();
+    } else {
+          const noTitle = title?.getAttribute("no-title");
+      if (noTitle) {
+        result.Title = noTitle;
+      }
     }
-
-    // If site is javascript based and has a no-title attribute when unloaded, use it.
-    const noTitle = title?.getAttribute("no-title");
-    if (noTitle) {
-      return noTitle;
-    }
-
-    // Otherwise if the site has no title/requires javascript simply return Title Unknown
-    return url;
-
+    result.Success = true;
+    return result;
   } catch (ex) {
     console.error(ex);
     // Try to figure out the file type
     const fileType = await tryGetFileType(url);
     if (fileType) {
-      return fileType;
+      result.Title = fileType;
     }
-    return "Site Unreachable";
+    return result;
   }
 }
 
