@@ -1,8 +1,5 @@
 function createH1(title, source = null, url = null) {
-    text = title
-        .replaceAll("[","(")
-        .replaceAll("]",")")
-        .trim();
+    let text = title.replaceAll("[", "(").replaceAll("]", ")").trim();
     if (url) {
         text = `[${text}](${url})`;
     }

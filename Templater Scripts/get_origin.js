@@ -1,34 +1,36 @@
 function getOrigin(url) {
-    const result = { Source: false, Author: false, Tags: [] };
+    const result = { Source: false, Creator: false, Tags: [] };
 
     if (url.startsWith("https://slatestarcodex.com/")) {
         result.Source = "SSC";
-        result.Author = "Scott Alexander";
+        result.Creator = "Scott Alexander";
         result.Tags.push("rationality");
-    }
-    else if (url.startsWith("https://www.astralcodexten.com/")) {
+    } else if (url.startsWith("https://www.astralcodexten.com/")) {
         result.Source = "ACX";
-        result.Author = "Scott Alexander";
+        result.Creator = "Scott Alexander";
         result.Tags.push("rationality");
     }
-    // TODO: Get Author from LW and EAF
+    // get_metadata handles author
     else if (url.startsWith("https://www.lesswrong.com/")) {
         result.Source = "LessWrong";
         result.Tags.push("rationality");
     }
+    // get_metadata handles author
     else if (url.startsWith("https://forum.effectivealtruism.org/posts/")) {
         result.Source = "EA Forum";
         result.Tags.push("ea");
-    }
-    else if (url.startsWith("https://thezvi.substack.com/p/")) {
+    } else if (url.startsWith("https://thezvi.substack.com/p/")) {
         result.Source = "Don't Worry About the Vase";
-        result.Author = "Zvi Mowshowitz";
+        result.Creator = "Zvi Mowshowitz";
         result.Tags.push("rationality");
-    }
-    else if (url.startsWith("https://www.readthesequences.com/")) {
+    } else if (url.startsWith("https://www.readthesequences.com/")) {
         result.Source = "The Sequences - Rationality From AI to Zombies|Sequences";
-        result.Author = "Eliezer Yudkowsky";
+        result.Creator = "Eliezer Yudkowsky";
         result.Tags.push("rationality");
+    } else if (url.startsWith("https://worksinprogress.co/")) {
+        result.Source = "Works in Progress";
+    } else if (url.startsWith("https://asteriskmag.com/")) {
+        result.Source = "Asterisk";
     }
 
     return result;

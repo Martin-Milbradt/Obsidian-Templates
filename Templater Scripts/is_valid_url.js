@@ -1,3 +1,3 @@
 module.exports = (url) => {
-	return /^(https?:\/*)(www\.)?\S+\.\S+$/.test(url);
+    return /^(https?:\/*)(www\.)?\S+\.\S+$/.test(url);
 };
