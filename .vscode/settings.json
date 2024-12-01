@@ -1,6 +1,11 @@
 {
     "markdownlint.config": {
         "MD041": false,
-        "MD003": false
+        "MD003": false,
+        "MD022": {
+            "lines_above": 0,
+            "lines_below": 0
+        },
+        "MD034": false
     }
 }

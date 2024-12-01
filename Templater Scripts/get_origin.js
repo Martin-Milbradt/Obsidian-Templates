@@ -27,7 +27,7 @@ function getOrigin(url) {
         result.Source = "The Sequences - Rationality From AI to Zombies|Sequences";
         result.Creator = "Eliezer Yudkowsky";
         result.Tags.push("rationality");
-    } else if (url.startsWith("https://worksinprogress.co/")) {
+    } else if (url.includes("worksinprogress.")) {
         result.Source = "Works in Progress";
     } else if (url.startsWith("https://asteriskmag.com/")) {
         result.Source = "Asterisk";

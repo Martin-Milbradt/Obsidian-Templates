@@ -4,6 +4,7 @@
 - User script create_filename
 - User script create_h1
 - User script create_yaml_array
+- User script get_metadata
 */
 
 // This template creates a new note from a YouTube URL. If there is a valid URL in the clipboard, it is used. Otherwise the user is asked for the URL to enter.
@@ -17,8 +18,8 @@ const valid_youtube_url = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu
 const disallowed = /[#<>"\?]/;
 
 // Test URLs:
-// url = "<https://youtu.be/KB1vxqD0uPE>"; // contains "|"
-// url = "<https://www.youtube.com/watch?v=F_8hbv3G1Q8>"; // contains "?"
+// url = "https://youtu.be/KB1vxqD0uPE"; // contains "|"
+// url = "https://www.youtube.com/watch?v=F_8hbv3G1Q8"; // contains "?"
 
 let url = "";
 let clipboard = await tp.system.clipboard();
@@ -35,38 +36,46 @@ if (!valid_youtube_url.test(url)) {
  return "Couldn't parse given URL. Probably this is not a valid YouTube link: " + url;
 }
 
-let page = await tp.obsidian.request({url});
-let p = new DOMParser();
-let doc = p.parseFromString(page, "text/html");
-let $ = s => doc.querySelector(s);
-
-const v_channel = $("link[itemprop='name']").getAttribute("content");
-const channel = v_channel.split[/ [—–-] /](0);
-const v_title = $("meta[property='og:title']").content;
-const v_upload_date = $("meta[itemprop='uploadDate']").content;
-const v_linkurl = $("link[rel='shortLinkUrl']").href;
-const v_duration = $("meta[itemprop='duration']").content.slice(2).replace(/M/, ":").replace(/S/, "").replace(/:(\d)$/, "\:0$1");
-// let v_description = $("meta[itemprop='description']").content
-filename = tp.user.create_filename(channel, v_title);
-while (disallowed.test(filename)) {
- filename = (await tp.system.prompt('Enter new filename, it contains illegal characters. (#<>"?)', `${channel} - ${v_title}`, true)).trim();
+const data = await tp.user.get_metadata(url);
+console.log(data.title)
+if (!data.success) {
+	console.error(data.message)
+	if (!data.title || !data.creator) {
+		const modalForm = app.plugins.plugins.modalforms.api;
+		values = {}
+		if (data.title) {
+			values.title = data.title
+		}
+		if (data.creator) {
+			values.creator = data.creator
+		}
+		input = await modalForm.openForm("video", {values: values})
+		data.title = input.data.title
+		data.creator = input.data.creator
+	}
 }
+
+filename = tp.user.create_filename(data.title, data.creator);
+while (disallowed.test(filename)) {
+ filename = (await tp.system.prompt('Enter new filename, it contains illegal characters. (#<>"?)', `${data.creator} - ${data.title}`, true)).trim();
+}
+filename = tp.user.create_filename(filename);
 
 await tp.file.move(scriptOptions.folder + filename)
 -%>
 ---
 
-<% tp.user.create_yaml_array("aliases", v_title) %>
-<% tp.user.create_yaml("creator", channel, true) %>
-date: <% v_upload_date %>
-length: <% v_duration %>
+<% tp.user.create_yaml_array("aliases", data.title) %>
+<% tp.user.create_yaml("creator", data.creator, true) %>
+<% tp.user.create_yaml("published", data.published) %>
+<% tp.user.create_yaml("length", data.length) %>
 tags: YouTube
-url: <% v_linkurl %>
+url: <% data.url %>
 watched: <% tp.date.now("YYYY-MM-DD") %>
 ---
 
-# <% tp.user.create_h1(v_title, channel, v_linkurl) %>
+# <% tp.user.create_h1(data.title, data.creator, data.url) %>
 
-![<% v_title %>](<% url %>)
+![<% data.title %>](<% url %>)
 
 ## Notes
