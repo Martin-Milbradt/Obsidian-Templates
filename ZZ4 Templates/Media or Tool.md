@@ -102,7 +102,6 @@ if (!input.data.media) {
 <% tp.user.create_yaml("creator", creator, true) %>
 <% input.data.media ? tp.user.create_yaml_array("tags", ["backlog"]) : "" %>
 <% year ? `year: ${year}` : "" %>
-tags:
 <% tp.user.create_yaml("url", url) %>
 ---
 

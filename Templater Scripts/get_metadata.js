@@ -14,7 +14,7 @@ async function tryGetFileType(url, result) {
 
         // Ensure site returns an ok status code before scraping
         if (!response.ok) {
-            result.message = response.statusText;
+            result.message = response.statusText ?? response.status;
             return;
         }
 
@@ -134,7 +134,8 @@ async function getMetaDataYouTube(url, result) {
         result.length = formatDuration(item.contentDetails.duration);
         result.success = true;
     } catch (ex) {
-        result.message = ex.message;
+        console.error(ex);
+        result.message = ex;
     }
 }
 
@@ -164,7 +165,7 @@ async function getMetaData(url) {
     } catch (ex) {
         console.error(ex);
         result.message = ex;
-        await tryGetFileType(url);
+        await tryGetFileType(url, result);
     }
     return result;
 }

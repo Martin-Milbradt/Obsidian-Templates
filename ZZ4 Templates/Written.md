@@ -34,7 +34,7 @@ if (tp.user.is_valid_url(title)) {
  url = title;
  url_yaml = `url:  ${url}`;
  const data = await tp.user.get_metadata(title);
- if (tp.user.is_valid_url(data.title)) {
+ if (!data.title || tp.user.is_valid_url(data.title)) {
   title = await tp.system.prompt("Title?");
  } else {
   title = data.title;
@@ -53,7 +53,6 @@ if (!origin.Source) {
 }
 
 const source = origin.Source ? origin.Source : origin.Creator;
-
 const h1 = tp.user.create_h1(title, source, url);
 const filename = tp.user.create_filename(title, source);
 await tp.file.move(scriptOptions.folder + filename)
