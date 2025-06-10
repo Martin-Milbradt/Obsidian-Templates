@@ -12,18 +12,23 @@
 
 // Config options here
 const scriptOptions = {
- folder: "/Media/Written/",
+  folder: "/Media/Written/",
 }
 
-let title = await tp.system.clipboard();
-if (title == "Error_MobileUnsupportedTemplate") {
- title = ""
+// Get initial values from clipboard
+let initialValues = {
+  link: await tp.system.clipboard()
+};
+
+if (initialValues.link === "Error_MobileUnsupportedTemplate") {
+  initialValues.link = "";
 }
 
-if (!tp.user.is_valid_url(title)) {
- title = await tp.system.prompt("Link / Title?");
-}
+// Open the form
+const result = await app.plugins.plugins.modalforms.api.openForm("written_note", { values: initialValues });
+if (!result) return;
 
+let title = result.data.link;
 let url_yaml = "";
 let published = null;
 let url = null;
@@ -31,25 +36,26 @@ let url = null;
 let origin = tp.user.get_origin(title);
 
 if (tp.user.is_valid_url(title)) {
- url = title;
- url_yaml = `url:  ${url}`;
- const data = await tp.user.get_metadata(title);
- if (!data.title || tp.user.is_valid_url(data.title)) {
-  title = await tp.system.prompt("Title?");
- } else {
-  title = data.title;
-  published = data.published;
- }
- if (data.creator && !origin.Creator) {
-	origin.Creator = data.creator
- }
+  url = title;
+  url_yaml = `url:  ${url}`;
+  const data = await tp.user.get_metadata(title);
+  if (!data.title || tp.user.is_valid_url(data.title)) {
+    title = await tp.system.prompt("Title?");
+  } else {
+    title = data.title;
+    published = data.published;
+  }
+  if (data.creator && !origin.Creator) {
+    origin.Creator = data.creator;
+  }
 }
 
-if (!origin.Source) {
- origin.Source = await tp.system.prompt("Source?");
- if (!origin.Creator) {
-	 origin.Creator = await tp.system.prompt("Creator?");
-	}
+// Update origin with form values
+if (result.data.source) {
+  origin.Source = result.data.source;
+}
+if (result.data.creator) {
+  origin.Creator = result.data.creator;
 }
 
 const source = origin.Source ? origin.Source : origin.Creator;
@@ -58,6 +64,7 @@ const filename = tp.user.create_filename(title, source);
 await tp.file.move(scriptOptions.folder + filename)
 -%>
 ---
+
 <% tp.user.create_yaml_array("tags", ["written"].concat(origin.Tags)) %>
 <% source ? tp.user.create_yaml_array("aliases", title) : "" %>
 <% tp.user.create_yaml("creator", origin.Creator, true) %>
@@ -65,4 +72,5 @@ await tp.file.move(scriptOptions.folder + filename)
 <% tp.user.create_yaml("source", origin.Source, true) %>
 <% url_yaml %>
 ---
+
 # <% h1 %>

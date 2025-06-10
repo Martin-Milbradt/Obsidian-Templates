@@ -150,6 +150,9 @@ async function getMetaData(url) {
         type: null,
         message: null,
     };
+    if (!url) {
+        throw new Error("No URL provided");
+    }
     if (!(url.startsWith("http") || url.startsWith("https"))) {
         url = "https://" + url;
     }

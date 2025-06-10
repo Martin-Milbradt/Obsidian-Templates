@@ -6,7 +6,7 @@
 
 // Config options here
 const scriptOptions = {
-	folder: "/ZZ4 Templates/",
+ folder: "/ZZ4 Templates/",
 }
 
 const valid_youtube_url = /^(https?:\/*)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)\S+$/;
@@ -26,7 +26,7 @@ if (clipboard == "Error_MobileUnsupportedTemplate") {
 
 let template;
 if (valid_youtube_url.test(clipboard)) {
-	template = tp.file.find_tfile(scriptOptions.folder + "Video (YouTube)")
+ template = tp.file.find_tfile(scriptOptions.folder + "Video (YouTube)")
 } else if (valid_bgg_url.test(clipboard)) {
  template = tp.file.find_tfile(scriptOptions.folder + "Board Game")
 } else if (valid_game_url.test(clipboard)) {

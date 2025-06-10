@@ -14,62 +14,7 @@ const scriptOptions = {
  toolFolder: "/Websites, Tools & Products/",
 }
 
-const inputForm = {
- "title": "Create Note",
- "name": "note",
- "fields": [
-  {
-   "name": "title",
-   "label": "Title",
-   "description": "",
-   "input": {
-    "type": "text"
-   }
-  },
-  {
-   "name": "creator",
-   "label": "Creator",
-   "description": "",
-   "input": {
-    "type": "text"
-   },
-  },
-  {
-   "name": "link",
-   "label": "Link",
-   "description": "",
-   "input": {
-    "type": "text"
-   }
-  },
-  {
-   "name": "year",
-   "label": "Year",
-   "description": "",
-   "input": {
-    "type": "number"
-   }
-  },
-  {
-	"name": "generate",
-	"label": "Generate description",
-	"description": "",
-	"input": {
-		"type": "toggle"
-	}
-  },
-  {
-	"name": "media",
-	"label": "Tool-Media",
-	"description": "",
-	"input": {
-		"type": "toggle"
-	}
-  },
- ]
-};
-
-const input = await app.plugins.plugins.modalforms.api.openForm(inputForm, {
+const input = await app.plugins.plugins.modalforms.api.openForm("media_or_tool", {
   values: {
    generate: false,
    media: true
@@ -77,15 +22,22 @@ const input = await app.plugins.plugins.modalforms.api.openForm(inputForm, {
  });
  
 let creator = input.data.creator;
-let year = input.data.year;
+let published = input.data.published;
 let title  = input.data.title;
 const url = input.data.link;
+const year = input.data.year;
 
-if (url) {
+if (tp.user.is_valid_url(url)) {
   const data = await tp.user.get_metadata(url);
-  creator = creator ?? data.Creator
-  year = year ?? data.Published
-  title = (title ?? data.Title) ?? url
+  if (data.title && !title) {
+    title = data.title;
+  }
+  if (data.published && !published) {
+    published = data.published;
+  }
+  if (data.creator && !creator) {
+    creator = data.creator;
+  }
 }
 
 const filename = tp.user.create_filename(title, creator);
@@ -101,7 +53,7 @@ if (!input.data.media) {
 <% creator ? tp.user.create_yaml_array("aliases", title) : "" %>
 <% tp.user.create_yaml("creator", creator, true) %>
 <% input.data.media ? tp.user.create_yaml_array("tags", ["backlog"]) : "" %>
-<% year ? `year: ${year}` : "" %>
+<% tp.user.create_yaml("published", published) %>
 <% tp.user.create_yaml("url", url) %>
 ---
 

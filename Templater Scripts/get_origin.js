@@ -1,6 +1,10 @@
 function getOrigin(url) {
     const result = { Source: false, Creator: false, Tags: [] };
 
+    if (!url) {
+        throw new Error("No URL provided");
+    }
+
     if (url.startsWith("https://slatestarcodex.com/")) {
         result.Source = "SSC";
         result.Creator = "Scott Alexander";

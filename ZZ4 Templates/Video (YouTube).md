@@ -39,20 +39,20 @@ if (!valid_youtube_url.test(url)) {
 const data = await tp.user.get_metadata(url);
 console.log(data.title)
 if (!data.success) {
-	console.error(data.message)
-	if (!data.title || !data.creator) {
-		const modalForm = app.plugins.plugins.modalforms.api;
-		values = {}
-		if (data.title) {
-			values.title = data.title
-		}
-		if (data.creator) {
-			values.creator = data.creator
-		}
-		input = await modalForm.openForm("video", {values: values})
-		data.title = input.data.title
-		data.creator = input.data.creator
-	}
+ console.error(data.message)
+ if (!data.title || !data.creator) {
+  const modalForm = app.plugins.plugins.modalforms.api;
+  values = {}
+  if (data.title) {
+   values.title = data.title
+  }
+  if (data.creator) {
+   values.creator = data.creator
+  }
+  input = await modalForm.openForm("video", {values: values})
+  data.title = input.data.title
+  data.creator = input.data.creator
+ }
 }
 
 filename = tp.user.create_filename(data.title, data.creator);
@@ -71,7 +71,7 @@ await tp.file.move(scriptOptions.folder + filename)
 <% tp.user.create_yaml("length", data.length) %>
 tags: YouTube
 url: <% data.url %>
-watched: <% tp.date.now("YYYY-MM-DD") %>
+finished: <% tp.date.now("YYYY-MM-DD") %>
 ---
 
 # <% tp.user.create_h1(data.title, data.creator, data.url) %>
