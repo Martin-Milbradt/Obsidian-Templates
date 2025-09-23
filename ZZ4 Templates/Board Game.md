@@ -28,6 +28,7 @@ let game = null; // The result as a game (title, description, image, average, mi
 let sanitized_filename = null; // Sanitized filename (also used as note name);
 let errorMsg = null; // Message in case of an error
 let link = null;
+let alias = null
 const titleDefault = tp.file.title.startsWith(scriptOptions.defaultTitle) ? "" : tp.file.title;
 let from_title = false;
 const modalForm = app.plugins.plugins.modalforms.api;
@@ -222,6 +223,9 @@ try {
    }
   });
   game = await selectBoardGame(input.data);
+  if (game.title.toLowerCase() != input.data.title.toLowerCase()) {
+    alias = input.data.title
+  }
  }
 
  link = `https://boardgamegeek.com/boardgame/${game.bggid}`
@@ -243,6 +247,7 @@ tags: ToDelete
 <%* } else {-%>
 ---
 tags: game/board<% input.data.coop ? ", game/co-op" : "" %>
+<% alias ? tp.user.create_yaml_array("aliases", alias) : "" %>
 bgg: <% game.average %>
 minplayers: <% game.minPlayers %>
 maxplayers: <% game.maxPlayers %>
@@ -258,8 +263,10 @@ year: <% game.year %>
 
 ## BGG Description
 
-![Image from BGG](<% game.image %>)
+<%* if (game.image){-%>
+!<% tp.user.create_h1(game.title, null, game.image) %>
 
+<%* }-%>
 <% game.description %>
 
 <%* } -%>

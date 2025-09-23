@@ -5,7 +5,7 @@ function createFilename(title, source = "") {
     } else {
         source = "";
     }
-    title = title.replace("|", "-");
+    title = title.replace(/[|<>]/g, "-");
     const sani = defaultSanitazions(title);
     return `${source}${sani}`;
 }
@@ -18,8 +18,8 @@ function defaultSanitazions(text) {
         .replace(/ ?& ?/g, " and ")
         .replace(/"([^"]+)"/g, "“$1”")
         .replace(/\[($1)\]/g, "($1)")
-        .replace(/[?[\]]/g, "")
-        .replace(/[\s\x00-\x1F*]+/g, " ") // warnings accepted here - I think sonarlint is mistaken
+        .replace(/[?[\]#]/g, "")
+        .replace(/[\s\x00-\x1F*]+/g, " ")
         .trim()
         .trimEnd(".");
 }

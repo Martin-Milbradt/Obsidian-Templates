@@ -12,6 +12,7 @@ const scriptOptions = {
 const valid_youtube_url = /^(https?:\/*)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)\S+$/;
 const valid_bgg_url = /^(https?:\/*)?(www\.)?boardgamegeek\.com\/boardgame\/(\d+)\S*$/;
 const valid_game_url = /^(https?:\/*)?(www\.)?store\.steampowered\.com\/app\/(\d+)\S*$/;
+const valid_imdb_url = /^(https?:\/*)?(www\.)?imdb\.com\/title\/tt(\d+)\S*$/;
 
 let clipboard = "";
 clipboard = await tp.system.clipboard();
@@ -31,6 +32,8 @@ if (valid_youtube_url.test(clipboard)) {
  template = tp.file.find_tfile(scriptOptions.folder + "Board Game")
 } else if (valid_game_url.test(clipboard)) {
  template = tp.file.find_tfile(scriptOptions.folder + "PC Game")
+} else if (valid_imdb_url.test(clipboard)) {
+ template = tp.file.find_tfile(scriptOptions.folder + "Media or Tool")
 } else {
  template = tp.file.find_tfile(scriptOptions.folder + "Written");
 }

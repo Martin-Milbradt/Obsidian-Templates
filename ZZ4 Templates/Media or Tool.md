@@ -14,8 +14,25 @@ const scriptOptions = {
  toolFolder: "/Websites, Tools & Products/",
 }
 
+let clip = await tp.system.clipboard()
+
+if (clip === "Error_MobileUnsupportedTemplate") {
+  clip = "";
+}
+
+let url = "";
+let title = "";
+
+if (tp.user.is_valid_url(clip)) {
+  url = clip;
+} else {
+  title = clip
+}
+
 const input = await app.plugins.plugins.modalforms.api.openForm("media_or_tool", {
   values: {
+   link: url,
+   title: title,
    generate: false,
    media: true
   }
@@ -23,8 +40,8 @@ const input = await app.plugins.plugins.modalforms.api.openForm("media_or_tool",
  
 let creator = input.data.creator;
 let published = input.data.published;
-let title  = input.data.title;
-const url = input.data.link;
+title  = input.data.title;
+url = input.data.link;
 const year = input.data.year;
 
 if (tp.user.is_valid_url(url)) {
@@ -48,20 +65,23 @@ await tp.file.rename(filename);
 if (!input.data.media) {
   await tp.file.move(scriptOptions.toolFolder + filename)
 }
+let description = null
+if (input.data.generate) {
+  description = await tp.user.describe(title, creator, year)
+}
 -%>
 ---
 <% creator ? tp.user.create_yaml_array("aliases", title) : "" %>
 <% tp.user.create_yaml("creator", creator, true) %>
-<% input.data.media ? tp.user.create_yaml_array("tags", ["backlog"]) : "" %>
+<% input.data.backlog ? tp.user.create_yaml_array("tags", ["backlog"]) : "" %>
 <% tp.user.create_yaml("published", published) %>
 <% tp.user.create_yaml("url", url) %>
 ---
 
 # <% h1 %>
+<%* if(description) { -%>
 
-<%* if(input.data.generate) { -%>
 ## Generated Description
 
-<% await tp.user.describe(title, creator, year) %>
-
+<% description %>
 <%* } -%>

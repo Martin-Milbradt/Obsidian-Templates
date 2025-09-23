@@ -76,6 +76,6 @@ finished: <% tp.date.now("YYYY-MM-DD") %>
 
 # <% tp.user.create_h1(data.title, data.creator, data.url) %>
 
-![<% data.title %>](<% url %>)
+!<% tp.user.create_h1(data.title, null, data.url) %>
 
 ## Notes

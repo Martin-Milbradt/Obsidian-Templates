@@ -15,62 +15,63 @@ const scriptOptions = {
   folder: "/Media/Written/",
 }
 
-// Get initial values from clipboard
-let initialValues = {
-  link: await tp.system.clipboard()
-};
+let clip = await tp.system.clipboard()
+let data = {}
 
-if (initialValues.link === "Error_MobileUnsupportedTemplate") {
-  initialValues.link = "";
+if (clip === "Error_MobileUnsupportedTemplate") {
+  clip = "";
+}
+
+if (tp.user.is_valid_url(clip)) {
+  data = tp.user.get_origin(clip);
+  data.url = clip
+} else {
+  data.title = clip
 }
 
 // Open the form
-const result = await app.plugins.plugins.modalforms.api.openForm("written_note", { values: initialValues });
-if (!result) return;
+const form = await app.plugins.plugins.modalforms.api.openForm("written_note", { values: data });
 
-let title = result.data.link;
-let url_yaml = "";
-let published = null;
-let url = null;
+// Update data with form values
+// `data` also might contain tags which would be overwritten by just setting = here.
+data.url = form.data.url
+data.title = form.data.title
+data.source = form.data.source
+data.creator = form.data.creator
+data.recommender = form.data.recommender
 
-let origin = tp.user.get_origin(title);
+if (!data.url && !data.title) {
+  throw new Error("URL or title is required");
+}
 
-if (tp.user.is_valid_url(title)) {
-  url = title;
-  url_yaml = `url:  ${url}`;
-  const data = await tp.user.get_metadata(title);
-  if (!data.title || tp.user.is_valid_url(data.title)) {
-    title = await tp.system.prompt("Title?");
-  } else {
-    title = data.title;
-    published = data.published;
+if (data.url) {
+  const metadata = await tp.user.get_metadata(data.url);
+  if(!data.title) {
+    data.title = metadata.title;
   }
-  if (data.creator && !origin.Creator) {
-    origin.Creator = data.creator;
+  data.published = metadata.published;
+  if (!data.creator) {
+    data.creator = metadata.creator;
   }
 }
 
-// Update origin with form values
-if (result.data.source) {
-  origin.Source = result.data.source;
-}
-if (result.data.creator) {
-  origin.Creator = result.data.creator;
+if (!data.title) {
+  data.title = await tp.system.prompt("Couldn't find title, please enter manually.");
 }
 
-const source = origin.Source ? origin.Source : origin.Creator;
-const h1 = tp.user.create_h1(title, source, url);
-const filename = tp.user.create_filename(title, source);
+const source = data.source ? data.source : data.creator;
+const h1 = tp.user.create_h1(data.title, data.source, data.url);
+const filename = tp.user.create_filename(data.title, data.source);
 await tp.file.move(scriptOptions.folder + filename)
 -%>
 ---
-
-<% tp.user.create_yaml_array("tags", ["written"].concat(origin.Tags)) %>
-<% source ? tp.user.create_yaml_array("aliases", title) : "" %>
-<% tp.user.create_yaml("creator", origin.Creator, true) %>
-<% tp.user.create_yaml("published", published) %>
-<% tp.user.create_yaml("source", origin.Source, true) %>
-<% url_yaml %>
+<% tp.user.create_yaml_array("tags", ["written"].concat(data.tags)) %>
+<% source ? tp.user.create_yaml_array("aliases", data.title) : "" %>
+<% tp.user.create_yaml("creator", data.creator, true) %>
+<% tp.user.create_yaml("published", data.published) %>
+<% tp.user.create_yaml_array("recommenders", data.recommender, !tp.user.is_valid_url(data.recommender)) %>
+<% tp.user.create_yaml("source", data.source, true) %>
+<% tp.user.create_yaml("url", data.url) %>
 ---
 
 # <% h1 %>
