@@ -1,8 +1,8 @@
 <%*
 /* Requirements:
 
-- User script sanitize_filename
-- User script is_valid_url
+- User script createFilename
+- User script isValidUrl
 */
 
 // Config options here
@@ -15,34 +15,33 @@ let h1 = ""
 let data;
 
 let input = await tp.system.clipboard();
-if (input == "Error_MobileUnsupportedTemplate") {
- input = ""
-}
 
-if (!tp.user.is_valid_url(input)) {
+if (!tp.user.isValidUrl(input)) {
  input = await tp.system.prompt("Link / Title?");
 }
 
-if (tp.user.is_valid_url(input)) {
+if (tp.user.isValidUrl(input)) {
  const url = input.replace(/(https:\/\/store\.steampowered\.com\/app\/\d+\/).*/, '$1');
- data = await tp.user.get_metadata(url);
+ data = { url: url };
+ await tp.user.getMetadata(tp, data);
  url_yaml = `url:  ${url}`;
  input = data.title.replace(/ on Steam$/, "").replace(/^Save \d+% on/, "")
  if (!input) {
   input = await tp.system.prompt("Title?");
  }
- h1 = tp.user.create_h1(input, null, url)
+ h1 = tp.user.createH1(input, null, url)
 } else {
  h1 = input
 }
 
-const filename = tp.user.sanitize_filename(input);
-console.log(filename)
+const filename = tp.user.createFilename(input);
 -%>
 ---
-tags: backlog, game/pc
-<% tp.user.create_yaml("creator", data?.Creator, true) %>
-<% tp.user.create_yaml("published", data?.Published) %>
+tags:
+  - backlog
+  - game/pc
+<% tp.user.createYaml("creator", data?.Creator, true) %>
+<% tp.user.createYaml("published", data?.Published) %>
 <% url_yaml %>
 ---
 # <% h1 %>

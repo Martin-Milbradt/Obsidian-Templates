@@ -6,7 +6,7 @@
 
 // Config options here
 const scriptOptions = {
-    folder: "/Interpersonal/Meetings & Events/Digital/",
+    folder: "/Interpersonal/Meetings & Events/",
 }
 
 const valid_date = /^\d{4}-\d\d-\d\d$/
@@ -28,12 +28,10 @@ if (!valid_date.test(date))
 const filename = tp.user.createFilename(title, date);
 -%>
 ---
-tags:
-  - digital
-  - 1-1
 date: <% date %>
-with:
-location: "[[digital]]"
+host:
+location:
+participants:
 ---
 # <% `[[${date}]] - ${title}` %>
 <%* await tp.file.move(scriptOptions.folder + filename) %>

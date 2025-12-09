@@ -14,11 +14,7 @@ const valid_bgg_url = /^(https?:\/*)?(www\.)?boardgamegeek\.com\/boardgame\/(\d+
 const valid_game_url = /^(https?:\/*)?(www\.)?store\.steampowered\.com\/app\/(\d+)\S*$/;
 const valid_imdb_url = /^(https?:\/*)?(www\.)?imdb\.com\/title\/tt(\d+)\S*$/;
 
-let clipboard = "";
-clipboard = await tp.system.clipboard();
-if (clipboard == "Error_MobileUnsupportedTemplate") {
- clipboard = ""
-}
+const clipboard = await tp.system.clipboard();
 
 // Test URLs:
 // clipboard = "https://youtu.be/KB1vxqD0uPE";

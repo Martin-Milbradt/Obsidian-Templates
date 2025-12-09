@@ -1,39 +1,42 @@
 function getOrigin(url) {
-    const result = { source: "", creator: "", tags: [] };
-
     if (!url) {
         throw new Error("No URL provided");
     }
 
-    if (url.startsWith("https://slatestarcodex.com/")) {
+    const urlObj = new URL(url);
+    const result = { source: "", creator: "", tags: [] };
+    if (urlObj.hostname === "slatestarcodex.com") {
         result.source = "SSC";
         result.creator = "Scott Alexander";
         result.tags.push("rationality");
-    } else if (url.startsWith("https://www.astralcodexten.com/")) {
+    } else if (urlObj.hostname === "www.astralcodexten.com") {
         result.source = "ACX";
         result.creator = "Scott Alexander";
         result.tags.push("rationality");
     }
-    // get_metadata handles author
-    else if (url.startsWith("https://www.lesswrong.com/")) {
+    // getMetadata handles author
+    else if (urlObj.hostname === "www.lesswrong.com" && urlObj.pathname.startsWith("/posts/")) {
         result.source = "LessWrong";
         result.tags.push("rationality");
+    } else if (urlObj.hostname === "desmolysium.com") {
+        result.creator = "Desmolysium";
+        result.tags.push("health");
     }
-    // get_metadata handles author
-    else if (url.startsWith("https://forum.effectivealtruism.org/posts/")) {
+    // getMetadata handles author
+    else if (urlObj.hostname === "forum.effectivealtruism.org" && urlObj.pathname.startsWith("/posts/")) {
         result.source = "EA Forum";
         result.tags.push("ea");
-    } else if (url.startsWith("https://thezvi.substack.com/p/")) {
+    } else if (urlObj.hostname === "thezvi.substack.com" && urlObj.pathname.startsWith("/p/")) {
         result.source = "Don't Worry About the Vase";
         result.creator = "Zvi Mowshowitz";
         result.tags.push("rationality");
-    } else if (url.startsWith("https://www.readthesequences.com/")) {
+    } else if (urlObj.hostname === "www.readthesequences.com") {
         result.source = "The Sequences - Rationality From AI to Zombies|Sequences";
         result.creator = "Eliezer Yudkowsky";
         result.tags.push("rationality");
-    } else if (url.includes("worksinprogress.")) {
+    } else if (urlObj.hostname.includes("worksinprogress.")) {
         result.source = "Works in Progress";
-    } else if (url.startsWith("https://asteriskmag.com/")) {
+    } else if (urlObj.hostname === "asteriskmag.com") {
         result.source = "Asterisk";
     }
 

@@ -1,17 +1,18 @@
-async function describe(title, creator = null, year = null) {
-    let request = `Write a concise and insightful description of "${title}"`;
-    if (year) request += ` (${year})`;
-    if (creator) request += ` by ${creator}`;
-    request += ".";
-
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+async function describe(tp, title, creator = null, year = null) {
+    let query = `Write a neutral, concise and insightful description of "${title}"`;
+    if (year) query += ` (${year})`;
+    if (creator) query += ` by ${creator}`;
+    const key = tp.user.secrets("OPENROUTER_API_KEY");
+    let response = null;
+    const request = {
+        url: "https://openrouter.ai/api/v1/chat/completions",
         method: "POST",
         headers: {
-            Authorization: "Bearer YOUR_TOKEN_HERE",
+            Authorization: `Bearer ${key}`,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: "anthropic/claude-opus-4.1",
+            model: tp.user.config("OPENROUTER_MODEL"),
             messages: [
                 {
                     role: "system",
@@ -20,26 +21,34 @@ async function describe(title, creator = null, year = null) {
                 },
                 {
                     role: "user",
-                    content: request,
+                    content: query,
                 },
             ],
+            reasoning: {
+                enabled: true,
+            },
+            stream: false,
         }),
-    });
+    };
+    try {
+        response = await fetch(request.url, request);
+        data = await response.json();
+        // Parse the JSON response
+        const description = data.choices[0].message.content;
+        if (!description) {
+            console.error("No description returned from API. Request:", request);
+            throw new Error("No description returned from API. Request: " + request);
+        }
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API error response:", errorText);
+        // Return the content from the choices
+        return description;
+    } catch (error) {
+        console.error(request);
+        if (response) {
+            console.error(response);
+        }
+        throw error;
     }
-
-    // Parse the JSON response
-    const data = await response.json();
-    const description = data.choices[0].message.content;
-    if (!description) {
-        console.error("No description returned from API. Request:", request);
-    }
-
-    // Return the content from the choices
-    return description;
 }
 
 module.exports = describe;

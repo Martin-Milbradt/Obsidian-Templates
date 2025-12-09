@@ -3,27 +3,22 @@
 
 - https://github.com/danielo515/obsidian-modal-form
 - User script describe
-- User script sanitize_filename
-- User script create_filename
+- User script createFilename
 - User script create_yaml
 - User script create_h1
-- User script create_yaml_array
+- User script createYamlArray
 */
 
 const scriptOptions = {
  toolFolder: "/Websites, Tools & Products/",
 }
 
-let clip = await tp.system.clipboard()
-
-if (clip === "Error_MobileUnsupportedTemplate") {
-  clip = "";
-}
+const clip = await tp.system.clipboard()
 
 let url = "";
 let title = "";
 
-if (tp.user.is_valid_url(clip)) {
+if (tp.user.isValidUrl(clip)) {
   url = clip;
 } else {
   title = clip
@@ -37,15 +32,16 @@ const input = await app.plugins.plugins.modalforms.api.openForm("media_or_tool",
    media: true
   }
  });
- 
+
 let creator = input.data.creator;
 let published = input.data.published;
 title  = input.data.title;
 url = input.data.link;
 const year = input.data.year;
 
-if (tp.user.is_valid_url(url)) {
-  const data = await tp.user.get_metadata(url);
+if (tp.user.isValidUrl(url)) {
+  const data = { url: url };
+  await tp.user.getMetadata(tp, data);
   if (data.title && !title) {
     title = data.title;
   }
@@ -57,9 +53,9 @@ if (tp.user.is_valid_url(url)) {
   }
 }
 
-const filename = tp.user.create_filename(title, creator);
+const filename = tp.user.createFilename(title, creator);
 
-h1 = tp.user.create_h1(title, creator, url)
+h1 = tp.user.createH1(title, creator, url)
 
 await tp.file.rename(filename);
 if (!input.data.media) {
@@ -67,15 +63,15 @@ if (!input.data.media) {
 }
 let description = null
 if (input.data.generate) {
-  description = await tp.user.describe(title, creator, year)
+  description = await tp.user.describe(tp, title, creator, year)
 }
 -%>
 ---
-<% creator ? tp.user.create_yaml_array("aliases", title) : "" %>
-<% tp.user.create_yaml("creator", creator, true) %>
-<% input.data.backlog ? tp.user.create_yaml_array("tags", ["backlog"]) : "" %>
-<% tp.user.create_yaml("published", published) %>
-<% tp.user.create_yaml("url", url) %>
+<% creator ? tp.user.createYamlArray("aliases", title) : "" %>
+<% tp.user.createYaml("creator", creator, true) %>
+<% input.data.backlog ? tp.user.createYamlArray("tags", ["backlog"]) : "" %>
+<% tp.user.createYaml("published", published) %>
+<% tp.user.createYaml("url", url) %>
 ---
 
 # <% h1 %>

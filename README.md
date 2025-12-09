@@ -9,6 +9,7 @@ The [Templater Scripts](Templater%20Scripts) called from the templates can be re
 
 ## Notes
 
+Some scripts call external APIs that require authorization. Add your keys to [Templater Scripts](secrets.js).
 The files are tailored for my personal use. They contain `scriptOptions` for some configurability, but you are encouraged to make them your own. Let me know what works for you and what doesn't!  
 Do not look at the files in [ZZ4 Templates](ZZ4%20Templaters) in GitHub's `Preview`, but use the `Code` view.
 
