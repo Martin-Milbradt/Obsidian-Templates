@@ -69,7 +69,7 @@ if (input.data.generate) {
 ---
 <% creator ? tp.user.createYamlArray("aliases", title) : "" %>
 <% tp.user.createYaml("creator", creator, true) %>
-<% input.data.backlog ? tp.user.createYamlArray("tags", ["backlog"]) : "" %>
+<% input.data.backlog ? tp.user.createYamlArray("tags", ["status/backlog"]) : "" %>
 <% tp.user.createYaml("published", published) %>
 <% tp.user.createYaml("url", url) %>
 ---

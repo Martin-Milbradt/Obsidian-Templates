@@ -36,6 +36,7 @@ async function getMetadataText(tp, data) {
     const html = await tp.obsidian.request(data.url);
     const doc = new DOMParser().parseFromString(html, "text/html");
     data.type = "text";
+    data.published = "";
     if (!data.creator) {
         let creator = doc.querySelector('meta[name="citation_author"]')?.content;
         if (!creator) {
@@ -69,7 +70,9 @@ async function getMetadataText(tp, data) {
                 }
             }
         }
-        data.published = published;
+        if (published) {
+            data.published = published;
+        }
     }
     if (!data.title) {
         const title = doc.querySelector("title");
@@ -147,7 +150,7 @@ async function getMetadataYouTube(tp, data) {
         });
         const api_url = `${baseUrl}?${params}`;
         const response = await tp.obsidian.request(api_url);
-        const responseData = await response.json();
+        const responseData = JSON.parse(response);
         const item = responseData.items[0];
 
         if (!data.title) {

@@ -1,10 +1,11 @@
 async function describe(tp, title, creator = null, year = null) {
-    let query = `Write a neutral, concise and insightful description of "${title}"`;
-    if (year) query += ` (${year})`;
-    if (creator) query += ` by ${creator}`;
+    let request = `Write a neutral, concise and insightful description of "${title}"`;
+    if (year) request += ` (${year})`;
+    if (creator) request += ` by ${creator}`;
+    const model = tp.user.utils.models("strong");
     const key = tp.user.secrets("OPENROUTER_API_KEY");
-    let response = null;
-    const request = {
+
+    const response = await tp.obsidian.request({
         url: "https://openrouter.ai/api/v1/chat/completions",
         method: "POST",
         headers: {
@@ -12,7 +13,7 @@ async function describe(tp, title, creator = null, year = null) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: tp.user.config("OPENROUTER_MODEL"),
+            model: model,
             messages: [
                 {
                     role: "system",
@@ -21,34 +22,36 @@ async function describe(tp, title, creator = null, year = null) {
                 },
                 {
                     role: "user",
-                    content: query,
+                    content: request,
                 },
             ],
             reasoning: {
                 enabled: true,
             },
-            stream: false,
         }),
-    };
-    try {
-        response = await fetch(request.url, request);
-        data = await response.json();
-        // Parse the JSON response
-        const description = data.choices[0].message.content;
-        if (!description) {
-            console.error("No description returned from API. Request:", request);
-            throw new Error("No description returned from API. Request: " + request);
-        }
+    });
 
-        // Return the content from the choices
-        return description;
-    } catch (error) {
-        console.error(request);
-        if (response) {
-            console.error(response);
+    let data;
+    if (typeof response === "string") {
+        data = JSON.parse(response);
+    } else if (response && typeof response.json === "function") {
+        if (!response.ok) {
+            const statusText = response.statusText || response.status || "Unknown error";
+            throw new Error(`API error response: ${statusText}`);
         }
-        throw error;
+        data = await response.json();
+    } else {
+        data = response;
     }
+
+    const description = data.choices[0].message.content;
+    if (!description) {
+        console.error("No description returned from API. Request:", request);
+        throw new Error("No description returned from API. Request: " + request);
+    }
+
+    // Return the content from the choices
+    return description;
 }
 
 module.exports = describe;

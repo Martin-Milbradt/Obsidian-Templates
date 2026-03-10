@@ -38,7 +38,7 @@ const filename = tp.user.createFilename(input);
 -%>
 ---
 tags:
-  - backlog
+  - status/backlog
   - game/pc
 <% tp.user.createYaml("creator", data?.Creator, true) %>
 <% tp.user.createYaml("published", data?.Published) %>

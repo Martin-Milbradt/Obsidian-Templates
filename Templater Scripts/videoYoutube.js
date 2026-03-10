@@ -2,10 +2,9 @@ const scriptOptions = {
     folder: "/Media/Videos/",
 };
 
-const valid_youtube_url = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)\S+$/;
-const disallowed = /[#<>"\?]/;
-
 async function renderNote(tp) {
+    const valid_youtube_url = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)\S+$/;
+    const disallowed = /[#<>"\?]/;
     let url = "";
     const clipboard = await tp.system.clipboard();
 

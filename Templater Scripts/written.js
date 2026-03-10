@@ -28,6 +28,7 @@ async function renderNote(tp) {
     data.creator = form.data.creator;
     data.recommender = form.data.recommender;
     data.tags = form.data.tags;
+    data.published = form.data.published;
 
     if (!data.url && !data.title) {
         throw new Error("URL or title is required");

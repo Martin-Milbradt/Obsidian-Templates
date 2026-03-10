@@ -12,6 +12,15 @@ async function safeRender(tp, renderFn) {
     }
 }
 
+function models(type = "default") {
+    const models = {
+        strong: "google/gemini-3-pro-preview",
+        default: "google/gemini-3-pro-preview",
+    };
+    return models[type];
+}
+
 module.exports = {
     safeRender,
+    models,
 };
